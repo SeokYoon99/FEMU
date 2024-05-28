@@ -1055,6 +1055,16 @@ static uint16_t nvme_directive_recv(FemuCtrl *n, NvmeCmd *cmd)
                                 sizeof(*(n->str_param)), prp1, prp2);
                 }
                 return NVME_INVALID_FIELD | NVME_DNR;
+
+	    case NVME_DIR_RCV_ST_OP_STATUS:
+		if (((numd + 1) * 4) < sizeof(*(n->str_stat))) {
+		    return dma_read_prp(n, (uint8_t *)n->str_stat, (numd + 1) * 4, prp1, prp2);
+		}
+		else {
+		    return dma_read_prp(n, (uint8_t *)n->str_stat, sizeof(*(n->str_stat)), prp1, prp2);
+		}
+		break;
+		
             default:
                 return NVME_INVALID_FIELD | NVME_DNR;
         }

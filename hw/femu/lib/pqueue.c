@@ -169,6 +169,7 @@ int pqueue_remove(pqueue_t *q, void *d)
     return 0;
 }
 
+// 우선순위 가장 높은 원소 제거
 void *pqueue_pop(pqueue_t *q)
 {
     void *head;
@@ -183,6 +184,7 @@ void *pqueue_pop(pqueue_t *q)
     return head;
 }
 
+// 우선순위 가장 높은 원소 참조
 void *pqueue_peek(pqueue_t *q)
 {
     void *d;

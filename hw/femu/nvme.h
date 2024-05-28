@@ -419,6 +419,7 @@ enum {
     NVME_DIRECTIVE_IDENTIFY         = 0x0,
     NVME_DIRECTIVE_STREAM           = 0x1,
     NVME_DIR_RCV_ID_OP_PARAM        = 0x1,
+    NVME_DIR_RCV_ST_OP_STATUS	    = 0x2,
     NVME_DIRECTIVE_DATA_PLACEMENT   = 0x2,
 };         
 
@@ -1226,6 +1227,11 @@ typedef struct NvmeDirStrParam {
     uint8_t      res6[6];
 } NvmeDirStrParam;                  
 
+typedef struct NvmeDirStrNsStat {
+    uint16_t	cnt;
+    uint16_t	id[65535];
+} NvmeDirStrNsStat;
+
 typedef struct FemuCtrl {
     PCIDevice       parent_obj;
     MemoryRegion    iomem;
@@ -1333,7 +1339,8 @@ typedef struct FemuCtrl {
     NvmeFeatureVal  features;
     NvmeIdCtrl      id_ctrl;
 
-    NvmeDirStrParam *str_param; 
+    NvmeDirStrParam *str_param;
+    NvmeDirStrNsStat *str_stat; 
 
     QSIMPLEQ_HEAD(aer_queue, NvmeAsyncEvent) aer_queue;
     QEMUTimer       *aer_timer;
@@ -1413,6 +1420,7 @@ enum {
     FEMU_BBSSD_MODE = 1,
     FEMU_NOSSD_MODE = 2,
     FEMU_ZNSSD_MODE = 3,
+    FEMU_MSSSD_MODE = 4,
     FEMU_SMARTSSD_MODE,
     FEMU_KVSSD_MODE,
 };
@@ -1445,6 +1453,11 @@ static inline bool NOSSD(FemuCtrl *n)
 static inline bool ZNSSD(FemuCtrl *n)
 {
     return (n->femu_mode == FEMU_ZNSSD_MODE);
+}
+
+static inline bool MSSSD(FemuCtrl *n)
+{
+	return(n->femu_mode == FEMU_MSSSD_MODE);
 }
 
 /* Basic NVMe Queue Pair operation APIs from nvme-util.c */
@@ -1506,6 +1519,7 @@ int nvme_register_ocssd20(FemuCtrl *n);
 int nvme_register_nossd(FemuCtrl *n);
 int nvme_register_bbssd(FemuCtrl *n);
 int nvme_register_znssd(FemuCtrl *n);
+int nvme_register_msssd(FemuCtrl *n);
 
 static inline uint64_t ns_blks(NvmeNamespace *ns, uint8_t lba_idx)
 {

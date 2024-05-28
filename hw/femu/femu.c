@@ -523,7 +523,9 @@ static int nvme_register_extensions(FemuCtrl *n)
         nvme_register_bbssd(n);
     } else if (ZNSSD(n)) {
         nvme_register_znssd(n);
-    } else {
+    } else if (MSSSD(n))  {
+	nvme_register_msssd(n);
+    }else {
         /* TODO: For future extensions */
     }
 
@@ -559,6 +561,7 @@ static void femu_realize(PCIDevice *pci_dev, Error **errp)
     n->aer_reqs = g_malloc0(sizeof(*n->aer_reqs) * (n->aerl + 1));
     n->features.int_vector_config = g_malloc0(sizeof(*n->features.int_vector_config) * (n->nr_io_queues + 1));
     n->str_param = g_malloc0(sizeof(NvmeDirStrParam));
+    n->str_stat = g_malloc0(sizeof(NvmeDirStrNsStat));
 
     nvme_init_pci(n);
     nvme_init_ctrl(n);
@@ -674,7 +677,7 @@ static Property femu_props[] = {
     DEFINE_PROP_INT32("blks_per_pl", FemuCtrl, bb_params.blks_per_pl, 256),
     DEFINE_PROP_INT32("pls_per_lun", FemuCtrl, bb_params.pls_per_lun, 1),
     DEFINE_PROP_INT32("luns_per_ch", FemuCtrl, bb_params.luns_per_ch, 8),
-    DEFINE_PROP_INT32("nchs", FemuCtrl, bb_params.nchs, 4),
+    DEFINE_PROP_INT32("nchs", FemuCtrl, bb_params.nchs, 8),
     DEFINE_PROP_INT32("pg_rd_lat", FemuCtrl, bb_params.pg_rd_lat, 40000),
     DEFINE_PROP_INT32("pg_wr_lat", FemuCtrl, bb_params.pg_wr_lat, 200000),
     DEFINE_PROP_INT32("blk_er_lat", FemuCtrl, bb_params.blk_er_lat, 2000000),
